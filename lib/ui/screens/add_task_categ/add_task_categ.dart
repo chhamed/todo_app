@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+
 import 'package:todo_app/models/task_categorie_model.dart';
 import 'package:todo_app/ui/theme/my_text_styles.dart';
-import 'package:todo_app/ui/widgets/icon_list.dart';
+import 'package:todo_app/ui/shared/icon_list.dart';
 
-import '../../../controllers/provider/task_categorie.dart';
+import '../../../controllers/provider/task_categorie_controller.dart';
 
 class AddTaskCateg extends StatefulWidget {
   const AddTaskCateg({Key? key}) : super(key: key);
@@ -27,6 +28,7 @@ class _AddTaskCategState extends State<AddTaskCateg> {
   }
 
   IconData? selectedIcon;
+  String? selectedColor;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +36,7 @@ class _AddTaskCategState extends State<AddTaskCateg> {
       onTap: () {
         FocusScope.of(context).unfocus();
       },
-      child: Consumer<TaskCategorie>(
+      child: Consumer<TaskCategorieController>(
         builder: (context, val, child) => AlertDialog(
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -57,40 +59,53 @@ class _AddTaskCategState extends State<AddTaskCateg> {
                       const SizedBox(
                         height: 10,
                       ),
-                      Container(
-                        margin: const EdgeInsets.all(15),
-                        child: Form(
-                          key: _formKey,
-                          child: TextFormField(
-                            controller: type,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter some text';
-                              }
-                              for (var categ in val.categTasks) {
-                                if (categ.type == value) {
-                                  return 'type already exists';
-                                }
-                              }
+                      FutureBuilder(
+                          future: val.readTaskCategData(),
+                          builder: (BuildContext context,
+                              AsyncSnapshot<List<Map<dynamic, dynamic>>>
+                                  snapshot) {
+                            return Container(
+                              margin: const EdgeInsets.all(15),
+                              child: Form(
+                                key: _formKey,
+                                child: TextFormField(
+                                  controller: type,
+                                  validator: (value) {
+                                    var keys = snapshot.data;
 
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                                focusColor: Colors.white,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter some text';
+                                    }
+
+                                    if (snapshot.data != null) {
+                                      for (var categ in keys!) {
+                                        if (categ['type'] == value) {
+                                          return 'type already exists';
+                                        }
+                                      }
+                                    }
+
+                                    return null;
+                                  },
+                                  decoration: InputDecoration(
+                                      focusColor: Colors.white,
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: const BorderSide(
+                                            color: Colors.cyan, width: 1.0),
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                      ),
+                                      fillColor: Colors.grey,
+                                      hintText: "Title",
+                                      hintStyle: MyTextStyles.hintStyle),
                                 ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                      color: Colors.cyan, width: 1.0),
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                                fillColor: Colors.grey,
-                                hintText: "Title",
-                                hintStyle: MyTextStyles.hintStyle),
-                          ),
-                        ),
-                      ),
+                              ),
+                            );
+                          }),
                       GridView.builder(
                           physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
@@ -107,10 +122,12 @@ class _AddTaskCategState extends State<AddTaskCateg> {
                                   iconSize: 30,
                                   icon: Icon(
                                     IconList.iconList[index],
-                                    color: IconList.iconColors[index],
+                                    color: Color(
+                                        int.parse(IconList.iconColors[index])),
                                   ),
                                   onPressed: () {
                                     selectedIcon = IconList.iconList[index];
+                                    selectedColor = IconList.iconColors[index];
                                     switchIndex(index);
                                   },
                                 ),
@@ -118,18 +135,16 @@ class _AddTaskCategState extends State<AddTaskCateg> {
                       const SizedBox(
                         height: 10,
                       ),
-                      Consumer<TaskCategorie>(
+                      Consumer<TaskCategorieController>(
                         builder: (context, value, child) => InkWell(
                           onTap: () {
                             if (_formKey.currentState!.validate()) {
-                              value.addTaskCateg(TaskCategorieModel(
-                                  icon: Icon(
-                                    selectedIcon ?? IconList.iconList[0],
-                                    color:
-                                        IconList.iconColors[currentColorIndex],
-                                  ),
+                              value.insertTaskCategorie(TaskCategorieModel(
                                   type: type.text,
-                                  tasks: []));
+                                  icon: selectedIcon ?? IconList.iconList[0],
+                                  color:
+                                      selectedColor ?? IconList.iconColors[0]));
+
                               Navigator.pop(context);
                             }
                           },
