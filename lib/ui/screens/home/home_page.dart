@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:todo_app/controllers/provider/task_categorie.dart';
+import 'package:todo_app/controllers/provider/task_categorie_controller.dart';
 
 import 'package:todo_app/ui/screens/add_task_categ/add_task_categ.dart';
 import 'package:todo_app/ui/screens/home/task_categ_list.dart';
@@ -20,7 +20,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<TaskCategorie>(
+    return Consumer<TaskCategorieController>(
       builder: (context, value, child) => Scaffold(
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerDocked,
