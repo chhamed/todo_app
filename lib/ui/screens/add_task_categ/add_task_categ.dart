@@ -4,9 +4,9 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import 'package:todo_app/models/task_categorie_model.dart';
 import 'package:todo_app/ui/theme/my_text_styles.dart';
-import 'package:todo_app/ui/shared/icon_list.dart';
 
 import '../../../controllers/provider/task_categorie_controller.dart';
+import '../../constants/icon_list.dart';
 
 class AddTaskCateg extends StatefulWidget {
   const AddTaskCateg({Key? key}) : super(key: key);

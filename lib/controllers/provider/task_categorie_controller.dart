@@ -41,7 +41,7 @@ class TaskCategorieController extends ChangeNotifier {
 
   Future<List<Map<dynamic, dynamic>>> readCompletetasks(
       TaskCategorieModel taskCategorieModel) async {
-    List<Map> response = await sqlDb.readCompletedTaskDate(taskCategorieModel);
+    List<Map> response = await sqlDb.readCompletedTaskData(taskCategorieModel);
 
     return response;
   }
@@ -58,12 +58,12 @@ class TaskCategorieController extends ChangeNotifier {
   }
 
   Future<List<Map<dynamic, dynamic>>> readDate() async {
-    List<Map> response = await sqlDb.readTaskDate();
+    List<Map> response = await sqlDb.readTaskData();
     return response;
   }
 
   Future<int> updateTask(TaskModel taskModel) async {
-    int response = await sqlDb.updatetask(taskModel);
+    int response = await sqlDb.updateTask(taskModel);
     return response;
   }
 

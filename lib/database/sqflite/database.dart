@@ -78,13 +78,13 @@ class SqlDb {
     return response;
   }
 
-  readTaskDate() async {
+  readTaskData() async {
     Database? mydb = await db;
     List response = await mydb!.rawQuery('SELECT * FROM task ');
     return response;
   }
 
-  readCompletedTaskDate(TaskCategorieModel taskCategorieModel) async {
+  readCompletedTaskData(TaskCategorieModel taskCategorieModel) async {
     Database? mydb = await db;
     List<Map> response = await mydb!.rawQuery(
         'SELECT * FROM task where statue= 1 and type = (?) ',
@@ -92,7 +92,7 @@ class SqlDb {
     return response;
   }
 
-  updatetask(TaskModel taskModel) async {
+  updateTask(TaskModel taskModel) async {
     Database? mydb = await db;
     int response = await mydb!.update('task', taskModel.toJson(),
         where: 'title=?', whereArgs: [taskModel.title]);
