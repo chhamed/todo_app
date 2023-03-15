@@ -26,54 +26,48 @@ class _CreateTaskState extends State<CreateTask> {
     return Consumer<TaskCategorieController>(
       builder: (context, val, child) => Form(
         key: _formKey,
-        child: FutureBuilder(
-            future: val.readDate(),
-            builder: (BuildContext context,
-                AsyncSnapshot<List<Map<dynamic, dynamic>>> snapshot) {
-              return TextFormField(
-                controller: title,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter some text';
-                  }
-                  var keys = snapshot.data;
-                  if (snapshot.data != null) {
-                    for (var categ in keys!) {
-                      if (categ['title'] == value) {
-                        return 'task already exists';
-                      }
-                    }
-                  }
+        child: TextFormField(
+          controller: title,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter some text';
+            }
+            var keys = val.tasksData;
+            if (val.tasksData != null) {
+              for (var categ in keys) {
+                if (categ['title'] == value) {
+                  return 'task already exists';
+                }
+              }
+            }
 
-                  return null;
+            return null;
+          },
+          decoration: InputDecoration(
+              suffixIcon: IconButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    val.insertTaskData(TaskModel(
+                        title: title.text,
+                        taskCategorieModeltype: widget.taskCategorieModel.type,
+                        statue: false));
+
+                    FocusScope.of(context).unfocus();
+                    title.clear();
+                  }
                 },
-                decoration: InputDecoration(
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          val.insertTaskData(TaskModel(
-                              title: title.text,
-                              taskCategorieModeltype:
-                                  widget.taskCategorieModel.type,
-                              statue: false));
-
-                          FocusScope.of(context).unfocus();
-                          title.clear();
-                        }
-                      },
-                      icon: const Icon(
-                        Icons.done,
-                        color: Colors.green,
-                      ),
-                    ),
-                    focusColor: Colors.white,
-                    border: const UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.cyan)),
-                    fillColor: Colors.grey,
-                    hintText: "title",
-                    hintStyle: MyTextStyles.hintStyle),
-              );
-            }),
+                icon: const Icon(
+                  Icons.done,
+                  color: Colors.green,
+                ),
+              ),
+              focusColor: Colors.white,
+              border: const UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.cyan)),
+              fillColor: Colors.grey,
+              hintText: "title",
+              hintStyle: MyTextStyles.hintStyle),
+        ),
       ),
     );
   }

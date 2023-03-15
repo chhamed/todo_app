@@ -8,8 +8,21 @@ import '../../../controllers/provider/task_categorie_controller.dart';
 import '../../theme/my_text_styles.dart';
 import '../../widgets/categorie_task_card.dart';
 
-class TaskCategList extends StatelessWidget {
+class TaskCategList extends StatefulWidget {
   const TaskCategList({Key? key}) : super(key: key);
+
+  @override
+  State<TaskCategList> createState() => _TaskCategListState();
+}
+
+class _TaskCategListState extends State<TaskCategList> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Provider.of<TaskCategorieController>(context, listen: false)
+        .readTaskCategData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,36 +40,27 @@ class TaskCategList extends StatelessWidget {
                 "My Lists",
                 style: MyTextStyles.headline1,
               ),
-              FutureBuilder(
-                  future: value.readTaskCategData(),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<List<Map<dynamic, dynamic>>> snapshot) {
-                    if (snapshot.data == null) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                    if (snapshot.data!.isEmpty) {
-                      return Center(
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              height: 10.h,
-                            ),
-                            Image.asset(
-                              "assets/images/empty.png",
-                            ),
-                            Text(
-                              "No categories yet !",
-                              style: MyTextStyles.subhead
-                                  .copyWith(color: Colors.grey),
-                            )
-                          ],
-                        ),
-                      );
-                    }
-                    if (snapshot.hasData) {
-                      return GridView.builder(
+              Consumer<TaskCategorieController>(
+                builder: (context, value, child) {
+                  return value.taskCategories.isEmpty
+                      ? Center(
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                height: 10.h,
+                              ),
+                              Image.asset(
+                                "assets/images/empty.png",
+                              ),
+                              Text(
+                                "No categories yet !",
+                                style: MyTextStyles.subhead
+                                    .copyWith(color: Colors.grey),
+                              )
+                            ],
+                          ),
+                        )
+                      : GridView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           gridDelegate:
@@ -64,7 +68,7 @@ class TaskCategList extends StatelessWidget {
                                   maxCrossAxisExtent: 30.h,
                                   crossAxisSpacing: 20,
                                   mainAxisSpacing: 20),
-                          itemCount: snapshot.data!.length,
+                          itemCount: value.taskCategories.length,
                           itemBuilder: (BuildContext ctx, index) {
                             return Draggable<Map<dynamic, dynamic>>(
                                 onDragStarted: () {
@@ -73,7 +77,7 @@ class TaskCategList extends StatelessWidget {
                                 onDraggableCanceled: (_, p) {
                                   value.isDeleting();
                                 },
-                                data: snapshot.data![index],
+                                data: value.taskCategories[index],
                                 feedback: SizedBox(
                                   height: 30.h - 20,
                                   width: 50.w - 20,
@@ -82,18 +86,17 @@ class TaskCategList extends StatelessWidget {
                                     child: CategorieTaskCard(
                                       taskCategorie:
                                           TaskCategorieModel.fromJson(
-                                              snapshot.data![index]),
+                                              value.taskCategories[index]),
                                     ),
                                   ),
                                 ),
                                 child: CategorieTaskCard(
                                   taskCategorie: TaskCategorieModel.fromJson(
-                                      snapshot.data![index]),
+                                      value.taskCategories[index]),
                                 ));
                           });
-                    }
-                    return const Center(child: CircularProgressIndicator());
-                  }),
+                },
+              ),
               const SizedBox(
                 height: 20,
               )

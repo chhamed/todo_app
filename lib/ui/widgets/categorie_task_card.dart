@@ -7,10 +7,23 @@ import 'package:todo_app/models/task_categorie_model.dart';
 import 'package:todo_app/ui/screens/tasks_screen/task_screen.dart';
 import 'package:todo_app/ui/theme/my_text_styles.dart';
 
-class CategorieTaskCard extends StatelessWidget {
+class CategorieTaskCard extends StatefulWidget {
   final TaskCategorieModel taskCategorie;
   const CategorieTaskCard({Key? key, required this.taskCategorie})
       : super(key: key);
+
+  @override
+  State<CategorieTaskCard> createState() => _CategorieTaskCardState();
+}
+
+class _CategorieTaskCardState extends State<CategorieTaskCard> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    var p = Provider.of<TaskCategorieController>(context, listen: false)
+      ..countTasks(widget.taskCategorie);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +33,7 @@ class CategorieTaskCard extends StatelessWidget {
           context,
           MaterialPageRoute(
               builder: (context) => TaskListScreen(
-                    taskCategorieModel: taskCategorie,
+                    taskCategorieModel: widget.taskCategorie,
                   )),
         );
       },
@@ -34,27 +47,23 @@ class CategorieTaskCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Icon(
-                  taskCategorie.icon,
-                  color: Color(int.parse(taskCategorie.color)),
+                  widget.taskCategorie.icon,
+                  color: Color(int.parse(widget.taskCategorie.color)),
                 ),
                 const SizedBox(
                   height: 30,
                 ),
                 Flexible(
                   child: AutoSizeText(
-                    taskCategorie.type,
+                    widget.taskCategorie.type,
                     maxLines: 2,
                     style: MyTextStyles.headline2,
                   ),
                 ),
-                FutureBuilder(
-                    future: value.countTasks(taskCategorie),
-                    builder: (BuildContext context, snapshot) {
-                      return Text(
-                        "${snapshot.data} tasks",
-                        style: MyTextStyles.body.copyWith(color: Colors.grey),
-                      );
-                    })
+                Text(
+                  "${value.allTasks} tasks",
+                  style: MyTextStyles.body.copyWith(color: Colors.grey),
+                )
               ],
             ),
           ),

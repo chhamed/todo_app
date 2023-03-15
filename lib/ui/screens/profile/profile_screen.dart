@@ -5,8 +5,27 @@ import 'package:todo_app/controllers/provider/task_categorie_controller.dart';
 
 import 'package:todo_app/ui/theme/my_text_styles.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      var task = Provider.of<TaskCategorieController>(context, listen: false)
+        ..countActive()
+        ..countCompleted()
+        ..countAll()
+        ..rapport();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,15 +66,11 @@ class ProfileScreen extends StatelessWidget {
                           const SizedBox(
                             width: 10,
                           ),
-                          FutureBuilder(
-                              future: value.countActive(),
-                              builder: (BuildContext context, snapshot) {
-                                return Text(
-                                  '${snapshot.data}',
-                                  style: MyTextStyles.headline2
-                                      .copyWith(fontWeight: FontWeight.w600),
-                                );
-                              }),
+                          Text(
+                            '${value.activeCount}',
+                            style: MyTextStyles.headline2
+                                .copyWith(fontWeight: FontWeight.w600),
+                          )
                         ],
                       ),
                       Text(
@@ -81,15 +96,11 @@ class ProfileScreen extends StatelessWidget {
                           const SizedBox(
                             width: 10,
                           ),
-                          FutureBuilder(
-                              future: value.countCompleted(),
-                              builder: (BuildContext context, snapshot) {
-                                return Text(
-                                  '${snapshot.data}',
-                                  style: MyTextStyles.headline2
-                                      .copyWith(fontWeight: FontWeight.w600),
-                                );
-                              }),
+                          Text(
+                            '${value.completedCount}',
+                            style: MyTextStyles.headline2
+                                .copyWith(fontWeight: FontWeight.w600),
+                          )
                         ],
                       ),
                       Text(
@@ -115,15 +126,11 @@ class ProfileScreen extends StatelessWidget {
                           const SizedBox(
                             width: 10,
                           ),
-                          FutureBuilder(
-                              future: value.countAll(),
-                              builder: (BuildContext context, snapshot) {
-                                return Text(
-                                  '${snapshot.data}',
-                                  style: MyTextStyles.headline2
-                                      .copyWith(fontWeight: FontWeight.w600),
-                                );
-                              }),
+                          Text(
+                            '${value.allCount}',
+                            style: MyTextStyles.headline2
+                                .copyWith(fontWeight: FontWeight.w600),
+                          )
                         ],
                       ),
                       Text(
@@ -141,46 +148,33 @@ class ProfileScreen extends StatelessWidget {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    FutureBuilder(
-                        future: value.rapport(),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<dynamic> snapshot) {
-                          if (snapshot.data == null) {
-                            return const CircularProgressIndicator();
-                          } else {
-                            return SizedBox(
-                              height: 30.h,
-                              width: 30.h,
-                              child: TweenAnimationBuilder(
-                                duration: const Duration(seconds: 1),
-                                tween:
-                                    Tween<double>(begin: 0, end: snapshot.data),
-                                builder: (context, double val, child) =>
-                                    CircularProgressIndicator(
-                                  backgroundColor: Colors.grey.withOpacity(0.4),
-                                  valueColor:
-                                      const AlwaysStoppedAnimation<Color>(
-                                          Colors.cyan),
-                                  strokeWidth: 15,
-                                  value: val,
-                                ),
+                    value.completedTasksCount == null
+                        ? CircularProgressIndicator()
+                        : SizedBox(
+                            height: 30.h,
+                            width: 30.h,
+                            child: TweenAnimationBuilder(
+                              duration: const Duration(seconds: 1),
+                              tween: Tween<double>(
+                                  begin: 0, end: value.completedTasksCount),
+                              builder: (context, double val, child) =>
+                                  CircularProgressIndicator(
+                                backgroundColor: Colors.grey.withOpacity(0.4),
+                                valueColor: const AlwaysStoppedAnimation<Color>(
+                                    Colors.cyan),
+                                strokeWidth: 15,
+                                value: val,
                               ),
-                            );
-                          }
-                        }),
+                            ),
+                          ),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        FutureBuilder(
-                            future: value.rapport(),
-                            builder:
-                                (BuildContext context, AsyncSnapshot snapshot) {
-                              return Text(
-                                '${((snapshot.data ?? 1) * 100).toInt()} %',
-                                style: MyTextStyles.headline2
-                                    .copyWith(fontWeight: FontWeight.w600),
-                              );
-                            }),
+                        Text(
+                          '${((value.completedTasksCount ?? 1) * 100).toInt()} %',
+                          style: MyTextStyles.headline2
+                              .copyWith(fontWeight: FontWeight.w600),
+                        ),
                         Text(
                           "Efficiency",
                           style:

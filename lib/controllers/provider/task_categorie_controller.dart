@@ -7,63 +7,83 @@ import '../../models/task_categorie_model.dart';
 class TaskCategorieController extends ChangeNotifier {
   SqlDb sqlDb = SqlDb();
 
-  Future<List<Map<dynamic, dynamic>>> readTaskCategData() async {
+  List<Map<dynamic, dynamic>> taskCategories = [];
+  Future readTaskCategData() async {
     List<Map> response = await sqlDb.readTaskCategData();
+    taskCategories = response;
     notifyListeners();
-    return response;
   }
 
-  Future<int?> countActive() async {
+  int activeCount = 0;
+  int completedCount = 0;
+  int allCount = 0;
+  Future countActive() async {
     int? response = await sqlDb.countAllActiveTasks();
-    return response;
+    activeCount = response ?? 0;
+    notifyListeners();
   }
 
-  Future<int?> countCompleted() async {
+  Future countCompleted() async {
     int? response = await sqlDb.countAllCompletedTasks();
-    return response;
+    completedCount = response ?? 0;
+    notifyListeners();
   }
 
-  Future<int?> countAll() async {
+  Future countAll() async {
     int? response = await sqlDb.countAllTasks();
-    return response;
+    allCount = response ?? 0;
+    notifyListeners();
   }
 
-  Future<double?> rapport() async {
+  double? completedTasksCount;
+
+  Future rapport() async {
     double? response = await sqlDb.countCompletedTasks();
-    return response;
+    completedTasksCount = response;
+    notifyListeners();
   }
 
-  Future<List<Map<dynamic, dynamic>>> readActiveDate(
-      TaskCategorieModel taskCategorieModel) async {
+  List<Map<dynamic, dynamic>> activeTasks = [];
+  Future readActiveDate(TaskCategorieModel taskCategorieModel) async {
     List<Map> response = await sqlDb.readActiveTaskDate(taskCategorieModel);
-    return response;
+    activeTasks = response;
+    notifyListeners();
   }
 
-  Future<List<Map<dynamic, dynamic>>> readCompletetasks(
-      TaskCategorieModel taskCategorieModel) async {
-    List<Map> response = await sqlDb.readCompletedTaskData(taskCategorieModel);
-
-    return response;
-  }
-
-  Future<double?> countRappot(TaskCategorieModel taskCategorieModel) async {
+  double? countCompeltedTasksCategorie;
+  Future countRappot(TaskCategorieModel taskCategorieModel) async {
     double? response =
         await sqlDb.countCompletedTasksPerCategorie(taskCategorieModel);
-    return response;
+    countCompeltedTasksCategorie = response;
+    notifyListeners();
   }
 
-  Future<int?> countTasks(TaskCategorieModel taskCategorieModel) async {
+  int allTasks = 0;
+  Future countTasks(TaskCategorieModel taskCategorieModel) async {
     int? response = await sqlDb.countTasksPerCategorie(taskCategorieModel);
-    return response;
+    allTasks = response ?? 0;
+    notifyListeners();
   }
 
-  Future<List<Map<dynamic, dynamic>>> readDate() async {
+  List<Map<dynamic, dynamic>> completeTasks = [];
+
+  Future readCompletetasks(TaskCategorieModel taskCategorieModel) async {
+    List<Map> response = await sqlDb.readCompletedTaskData(taskCategorieModel);
+    completeTasks = response;
+    notifyListeners();
+  }
+
+  List<Map<dynamic, dynamic>> tasksData = [];
+
+  Future readDate() async {
     List<Map> response = await sqlDb.readTaskData();
-    return response;
+    tasksData = response;
+    notifyListeners();
   }
 
   Future<int> updateTask(TaskModel taskModel) async {
     int response = await sqlDb.updateTask(taskModel);
+    notifyListeners();
     return response;
   }
 
@@ -75,11 +95,14 @@ class TaskCategorieController extends ChangeNotifier {
 
   Future<int> insertTaskData(TaskModel taskModel) async {
     int response = await sqlDb.insertTaskData(taskModel);
+    notifyListeners();
     return response;
   }
 
   Future<int> insertTaskCategorie(TaskCategorieModel taskCategorieModel) async {
     int response = await sqlDb.insertTaskCategData(taskCategorieModel);
+
+    notifyListeners();
     return response;
   }
 

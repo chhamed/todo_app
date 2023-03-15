@@ -31,6 +31,17 @@ class _AddTaskCategState extends State<AddTaskCateg> {
   String? selectedColor;
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      var pro = Provider.of<TaskCategorieController>(context, listen: false)
+        ..readDate()
+        ..readTaskCategData();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
@@ -59,53 +70,45 @@ class _AddTaskCategState extends State<AddTaskCateg> {
                       const SizedBox(
                         height: 10,
                       ),
-                      FutureBuilder(
-                          future: val.readTaskCategData(),
-                          builder: (BuildContext context,
-                              AsyncSnapshot<List<Map<dynamic, dynamic>>>
-                                  snapshot) {
-                            return Container(
-                              margin: const EdgeInsets.all(15),
-                              child: Form(
-                                key: _formKey,
-                                child: TextFormField(
-                                  controller: type,
-                                  validator: (value) {
-                                    var keys = snapshot.data;
+                      Container(
+                        margin: const EdgeInsets.all(15),
+                        child: Form(
+                          key: _formKey,
+                          child: TextFormField(
+                            controller: type,
+                            validator: (value) {
+                              var keys = val.taskCategories;
 
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter some text';
-                                    }
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter some text';
+                              }
 
-                                    if (snapshot.data != null) {
-                                      for (var categ in keys!) {
-                                        if (categ['type'] == value) {
-                                          return 'type already exists';
-                                        }
-                                      }
-                                    }
+                              if (val.taskCategories != null) {
+                                for (var categ in keys) {
+                                  if (categ['type'] == value) {
+                                    return 'type already exists';
+                                  }
+                                }
+                              }
 
-                                    return null;
-                                  },
-                                  decoration: InputDecoration(
-                                      focusColor: Colors.white,
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderSide: const BorderSide(
-                                            color: Colors.cyan, width: 1.0),
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                      ),
-                                      fillColor: Colors.grey,
-                                      hintText: "Title",
-                                      hintStyle: MyTextStyles.hintStyle),
+                              return null;
+                            },
+                            decoration: InputDecoration(
+                                focusColor: Colors.white,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
                                 ),
-                              ),
-                            );
-                          }),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                      color: Colors.cyan, width: 1.0),
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                fillColor: Colors.grey,
+                                hintText: "Title",
+                                hintStyle: MyTextStyles.hintStyle),
+                          ),
+                        ),
+                      ),
                       GridView.builder(
                           physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,

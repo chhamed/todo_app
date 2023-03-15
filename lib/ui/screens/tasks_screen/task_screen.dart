@@ -23,6 +23,15 @@ class TaskListScreen extends StatefulWidget {
 class _TaskListScreenState extends State<TaskListScreen> {
   TextEditingController title = TextEditingController();
   SqlDb sqlDb = SqlDb();
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    var p = Provider.of<TaskCategorieController>(context, listen: false)
+      ..readDate()
+      ..readActiveDate(widget.taskCategorieModel)
+      ..readCompletetasks(widget.taskCategorieModel);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,22 +107,16 @@ class _TaskListScreenState extends State<TaskListScreen> {
                     const SizedBox(
                       height: 10,
                     ),
-                    FutureBuilder(
-                        future: value.readActiveDate(widget.taskCategorieModel),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<List<Map<dynamic, dynamic>>>
-                                snapshot) {
-                          return Column(
-                            children: [
-                              ...List.generate(
-                                  snapshot.data?.length ?? 0,
-                                  (index) => TaskWidget(
-                                        task: TaskModel.fromJson(
-                                            snapshot.data![index]),
-                                      )),
-                            ],
-                          );
-                        }),
+                    Column(
+                      children: [
+                        ...List.generate(
+                            value.activeTasks.length,
+                            (index) => TaskWidget(
+                                  task: TaskModel.fromJson(
+                                      value.activeTasks[index]),
+                                )),
+                      ],
+                    ),
                     Text(
                       "Completed",
                       style:
@@ -122,31 +125,22 @@ class _TaskListScreenState extends State<TaskListScreen> {
                     const SizedBox(
                       height: 10,
                     ),
-                    FutureBuilder(
-                        future:
-                            value.readCompletetasks(widget.taskCategorieModel),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<List<Map<dynamic, dynamic>>>
-                                snapshot) {
-                          return Column(
-                            children: [
-                              ...List.generate(snapshot.data?.length ?? 0,
-                                  (index) {
-                                return Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 8),
-                                  child: TaskWidget(
-                                      task: TaskModel.fromJson(
-                                          snapshot.data![index]),
-                                      function: () {
-                                        value.deleteTask(TaskModel.fromJson(
-                                            snapshot.data![index]));
-                                      }),
-                                );
-                              }),
-                            ],
+                    Column(
+                      children: [
+                        ...List.generate(value.completeTasks.length, (index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: TaskWidget(
+                                task: TaskModel.fromJson(
+                                    value.completeTasks[index]),
+                                function: () {
+                                  value.deleteTask(TaskModel.fromJson(
+                                      value.completeTasks[index]));
+                                }),
                           );
                         }),
+                      ],
+                    )
                   ],
                 ),
               ),
