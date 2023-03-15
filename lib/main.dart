@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:todo_app/controllers/provider/screen_switch.dart';
 import 'package:todo_app/controllers/provider/task_categorie_controller.dart';
 import 'package:todo_app/ui/screens/home/home_page.dart';
 
@@ -21,8 +22,9 @@ class MyApp extends StatelessWidget {
         return MultiProvider(
             providers: [
               ChangeNotifierProvider(create: (_) => TaskCategorieController()),
+              ChangeNotifierProvider(create: (_) => ScreenSwitch()),
             ],
-            child: const MaterialApp(
+            child: MaterialApp(
               debugShowCheckedModeBanner: false,
               home: Home(),
             ));
